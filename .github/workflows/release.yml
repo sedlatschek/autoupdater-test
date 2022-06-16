@@ -23,7 +23,7 @@ jobs:
         run: |
           dotnet build --configuration Release --no-restore
           Compress-Archive bin/Release/net6.0-windows/* autoupdater-test.windows-amd64.zip
-          ((Get-Content -path ./update.xml -Raw) -replace '{{VERSION}}','${{ github.ref }}') | Set-Content -Path ./update.xml
+          ((Get-Content -path ./update.xml -Raw) -replace '{{VERSION}}','${GITHUB_REF_NAME}') | Set-Content -Path ./update.xml
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
