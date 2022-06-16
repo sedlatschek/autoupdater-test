@@ -21,7 +21,7 @@ jobs:
           dotnet restore
           cd setup
           dotnet restore
-      - name: Build
+      - name: Build App
         shell: pwsh 
         run: |
           $env:VERSION = '${{ github.ref_name }}' -replace '^v',''
@@ -29,6 +29,9 @@ jobs:
           ((Get-Content -path ./autoupdater-test.csproj -Raw) -replace '0.0.0.0',$env:VERSION) | Set-Content -Path ./autoupdater-test.csproj
           dotnet build --configuration Release --no-restore
           Compress-Archive bin/Release/net6.0-windows/* autoupdater-test.windows-amd64.zip
+      - name: Build Installer
+        shell: pwsh 
+        run: |
           cd setup
           dotnet build --configuration Debug --no-restore
           & .\bin\Debug\net451\setup.exe
@@ -67,6 +70,6 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: setup/autoupdater-test.msi
+          asset_path: ./setup/autoupdater-test.msi
           asset_name: autoupdater-test.msi
           asset_content_type: application/x-msi
