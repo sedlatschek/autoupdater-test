@@ -21,10 +21,11 @@ jobs:
       - name: Build
         shell: pwsh 
         run: |
-          dotnet build --configuration Release --no-restore
-          Compress-Archive bin/Release/net6.0-windows/* autoupdater-test.windows-amd64.zip
           $env:VERSION = '${{ github.ref_name }}' -replace '^v',''
           ((Get-Content -path ./update.xml -Raw) -replace '{{VERSION}}',$env:VERSION) | Set-Content -Path ./update.xml
+          ((Get-Content -path ./autoupdater-test.csproj -Raw) -replace '0.0.0.0',$env:VERSION) | Set-Content -Path ./autoupdater-test.csproj
+          dotnet build --configuration Release --no-restore
+          Compress-Archive bin/Release/net6.0-windows/* autoupdater-test.windows-amd64.zip          
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1

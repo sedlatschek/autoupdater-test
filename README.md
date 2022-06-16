@@ -1,3 +1,3 @@
 # autoupdater-test
 
-Repo to test AutoUpdater.NET
+Repo to test AutoUpdater.NET.
