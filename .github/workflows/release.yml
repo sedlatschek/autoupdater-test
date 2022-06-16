@@ -23,6 +23,7 @@ jobs:
         run: |
           dotnet build --configuration Release --no-restore
           Compress-Archive bin/Release/net6.0-windows/* autoupdater-test.windows-amd64.zip
+          ((Get-Content -path ./update.xml -Raw) -replace '{{VERSION}}','${{ github.ref }}') | Set-Content -Path ./update.xml
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -43,3 +44,12 @@ jobs:
           asset_path: ./autoupdater-test.windows-amd64.zip
           asset_name: autoupdater-test.windows-amd64.zip
           asset_content_type: application/zip
+      - name: Upload Update Artifacts
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./update.xml
+          asset_name: update.xml
+          asset_content_type: application/xml

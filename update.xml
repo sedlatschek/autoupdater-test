@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<item>
+  <version>{{VERSION}}</version>
+  <url>https://github.com/sedlatschek/autoupdater-test/releases/download/{{VERSION}}/autoupdater-test.windows-amd64.zip</url>
+  <changelog>https://github.com/sedlatschek/autoupdater-test/releases/</changelog>
+  <mandatory>false</mandatory>
+</item>
