@@ -17,7 +17,10 @@ jobs:
         with:
           dotnet-version: '6.0.x'
       - name: Install dependencies
-        run: dotnet restore
+        run: |
+          dotnet restore
+          cd setup
+          dotnet restore
       - name: Build
         shell: pwsh 
         run: |
@@ -25,7 +28,10 @@ jobs:
           ((Get-Content -path ./update.xml -Raw) -replace '{{VERSION}}',$env:VERSION) | Set-Content -Path ./update.xml
           ((Get-Content -path ./autoupdater-test.csproj -Raw) -replace '0.0.0.0',$env:VERSION) | Set-Content -Path ./autoupdater-test.csproj
           dotnet build --configuration Release --no-restore
-          Compress-Archive bin/Release/net6.0-windows/* autoupdater-test.windows-amd64.zip          
+          Compress-Archive bin/Release/net6.0-windows/* autoupdater-test.windows-amd64.zip
+          cd setup
+          dotnet build --configuration Debug --no-restore
+          & .\bin\Debug\net451\setup.exe
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -37,16 +43,7 @@ jobs:
           body: Please refer to CHANGELOG.md for details.
           draft: false
           prerelease: false
-      - name: Upload Release Artifacts
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./autoupdater-test.windows-amd64.zip
-          asset_name: autoupdater-test.windows-amd64.zip
-          asset_content_type: application/zip
-      - name: Upload Update Artifacts
+      - name: Upload Metadata
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -55,3 +52,21 @@ jobs:
           asset_path: ./update.xml
           asset_name: update.xml
           asset_content_type: application/xml
+      - name: Upload Update
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./autoupdater-test.windows-amd64.zip
+          asset_name: autoupdater-test.windows-amd64.zip
+          asset_content_type: application/zip
+      - name: Upload Installer
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: setup/autoupdater-test.msi
+          asset_name: autoupdater-test.msi
+          asset_content_type: application/x-msi
